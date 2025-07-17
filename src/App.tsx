@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './com
 import { Button } from './components/ui/button'
 import { Progress } from './components/ui/progress'
 import { Badge } from './components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Textarea } from './components/ui/textarea'
 import { Alert, AlertDescription } from './components/ui/alert'
 
@@ -334,49 +333,25 @@ function App() {
                   <span>Input Data</span>
                 </CardTitle>
                 <CardDescription>
-                  Provide structured data to map to the detected form fields
+                  Provide unstructured data that will be intelligently mapped to form fields using AI
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="json" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="json">JSON Data</TabsTrigger>
-                    <TabsTrigger value="form">Form Input</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="json" className="space-y-4">
-                    <Textarea
-                      placeholder={`{
-  "fullName": "John Doe",
-  "email": "john.doe@example.com",
-  "dateOfBirth": "1990-01-15",
-  "termsAgreement": true
-}`}
-                      value={userData}
-                      onChange={(e) => setUserData(e.target.value)}
-                      className="min-h-[200px] font-mono text-sm"
-                    />
-                  </TabsContent>
-                  <TabsContent value="form" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Full Name</label>
-                        <input className="w-full px-3 py-2 border rounded-md" placeholder="John Doe" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Email</label>
-                        <input className="w-full px-3 py-2 border rounded-md" placeholder="john@example.com" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Date of Birth</label>
-                        <input type="date" className="w-full px-3 py-2 border rounded-md" />
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="terms" />
-                        <label htmlFor="terms" className="text-sm">I agree to the terms</label>
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                <div className="space-y-4">
+                  <Textarea
+                    placeholder={`Enter any unstructured data here. The AI will intelligently map this information to the detected form fields.
+
+Example:
+My name is John Doe and I was born on January 15, 1990. You can reach me at john.doe@example.com. I'm 34 years old and work as a Software Engineer at Tech Corp. My address is 123 Main Street, San Francisco, CA 94105. Phone number is (555) 123-4567. I agree to the terms and conditions.`}
+                    value={userData}
+                    onChange={(e) => setUserData(e.target.value)}
+                    className="min-h-[250px] text-sm resize-none"
+                  />
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{userData.length} characters</span>
+                    <span>AI will extract relevant information automatically</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -436,33 +411,47 @@ function App() {
             </Card>
 
             {/* Download Results */}
-            {processingState.currentStep === 'complete' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center space-x-2">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Ready to Download</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center space-x-2">
+                  {processingState.currentStep === 'complete' ? (
+                    <>
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span>Ready to Download</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-5 h-5 text-gray-400" />
+                      <span>Download Results</span>
+                    </>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {processingState.currentStep === 'complete' ? (
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
                       Document processed successfully! All fields have been filled with the provided data.
                     </AlertDescription>
                   </Alert>
-                  <Button 
-                    className="w-full" 
-                    size="lg"
-                    onClick={handleDownload}
-                    disabled={!filledDocumentUrl}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Filled PDF
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+                ) : (
+                  <div className="text-sm text-gray-500 text-center py-4">
+                    Complete processing to download your filled document
+                  </div>
+                )}
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={handleDownload}
+                  disabled={!filledDocumentUrl}
+                  variant={filledDocumentUrl ? "default" : "outline"}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {filledDocumentUrl ? "Download Filled PDF" : "Download Not Ready"}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
